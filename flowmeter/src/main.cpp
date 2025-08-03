@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include <LoRa.h>
+#include <string.h>
 
 #define ss 5
 #define rst 14
@@ -97,7 +98,7 @@ void loop()
     previousTime = currentTime;
   }
 
-  if (currentTime - lastStatsTime < 1000)
+  if (currentTime - lastStatsTime < 10000)
     return;
 
   if (sampleCount > 0)
@@ -115,10 +116,13 @@ void loop()
     }
     float stdDev = sqrt(variance / sampleCount);
 
+    uint8_t packet[12];
+    memcpy(packet, &currentTime, sizeof(currentTime));
+    memcpy(packet + 4, &average, sizeof(average));
+    memcpy(packet + 8, &stdDev, sizeof(stdDev));
+
     LoRa.beginPacket();
-    LoRa.write((uint8_t *)&currentTime, sizeof(currentTime));
-    LoRa.write((uint8_t *)&average, sizeof(average));
-    LoRa.write((uint8_t *)&stdDev, sizeof(stdDev));
+    LoRa.write(packet, 12);
     LoRa.endPacket();
 
     Serial.print("Binary packet sent - Timestamp: ");

@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <string.h>
 
 #define ss 5
 #define rst 14
@@ -17,8 +18,9 @@ const char *googleScriptURL = "https://script.google.com/macros/s/AKfycbztDOn1Id
 
 float avgFlowRate = 0.0;
 float stdFlowRate = 0.0;
+unsigned long senderTimestamp = 0;
 
-void sendToGoogleSheets(float avgFlow, float stdFlow)
+void sendToGoogleSheets(float avgFlow, float stdFlow, unsigned long senderTimestamp)
 {
   if (WiFi.status() != WL_CONNECTED)
   {
@@ -49,7 +51,7 @@ void sendToGoogleSheets(float avgFlow, float stdFlow)
   http.setRedirectLimit(MAX_REDIRECT);
 
   StaticJsonDocument<400> doc;
-  doc["timestamp"] = millis();
+  doc["timestamp"] = senderTimestamp;
   doc["avg_flow_rate"] = avgFlow;
   doc["std_flow_rate"] = stdFlow;
 
@@ -60,8 +62,8 @@ void sendToGoogleSheets(float avgFlow, float stdFlow)
   Serial.println(jsonString);
 
   Serial.println("Debug - Individual values:");
-  Serial.print("Timestamp: ");
-  Serial.println(millis());
+  Serial.print("Sender Timestamp: ");
+  Serial.println(senderTimestamp);
   Serial.print("Average Flow Rate: ");
   Serial.println(avgFlow);
   Serial.print("Standard Deviation Flow Rate: ");
@@ -176,13 +178,12 @@ bool parseLoRaBinaryData(uint8_t *data, int length)
     return false;
   }
 
-  unsigned long senderTimestamp;
   memcpy(&senderTimestamp, data, sizeof(senderTimestamp));
   memcpy(&avgFlowRate, data + 4, sizeof(avgFlowRate));
   memcpy(&stdFlowRate, data + 8, sizeof(stdFlowRate));
 
   Serial.println("Parsed LoRa binary data:");
-  Serial.print("Timestamp: ");
+  Serial.print("Sender Timestamp: ");
   Serial.println(senderTimestamp);
   Serial.print("Average Flow Rate: ");
   Serial.println(avgFlowRate, 3);
@@ -215,6 +216,6 @@ void loop()
   if (parseLoRaBinaryData(buffer, bytesRead))
   {
     Serial.println("Sending parsed data to Google Sheets...");
-    sendToGoogleSheets(avgFlowRate, stdFlowRate);
+    sendToGoogleSheets(avgFlowRate, stdFlowRate, senderTimestamp);
   }
 }
