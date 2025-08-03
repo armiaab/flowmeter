@@ -68,7 +68,7 @@ void loop()
 
     if (pulses > 0)
     {
-      flowRate = (pulses / calibrationFactor) * 1200.0; // 60000ms/50ms = 1200
+      flowRate = (pulses / calibrationFactor) * 1200.0; // 60000/50 = 1200
       totalVolume += (pulses / calibrationFactor);
     }
     else if (timeSinceLastPulse > FLOW_TIMEOUT)
