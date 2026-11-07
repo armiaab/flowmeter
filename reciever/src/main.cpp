@@ -11,10 +11,10 @@
 #define MAX_REDIRECT 5
 #define MAX_BUFFER_SIZE 32
 
-const char *ssid = "11";
-const char *password = "0101010101";
+const char *ssid = "YOUR_WIFI_SSID";
+const char *password = "YOUR_WIFI_PASSWORD";
 
-const char *googleScriptURL = "https://script.google.com/macros/s/AKfycbztDOn1IdP2JrgMtb51rxRHkmdZNFcfQziyxM8Vi3q2HNldOKyOOoP1eNrN7wAb8to/exec";
+const char *googleScriptURL = "YOUR_APPS_SCRIPT_URL";
 
 float avgFlowRate = 0.0;
 float stdFlowRate = 0.0;
